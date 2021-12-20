@@ -1,13 +1,14 @@
 import React, { useEffect } from "react";
 import {
-  Image,
-  StyleSheet,
   View,
+  StyleSheet,
+  Image,
   TouchableWithoutFeedback,
   Alert,
 } from "react-native";
-import * as ImagePicker from "expo-image-picker";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+
 import colors from "../config/colors";
 
 function ImageInput({ imageUri, onChangeImage }) {
@@ -16,21 +17,16 @@ function ImageInput({ imageUri, onChangeImage }) {
   }, []);
 
   const requestPermission = async () => {
-    const { granted } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!granted) alert("you need to enable permission manually.");
+    const { granted } = await ImagePicker.requestCameraRollPermissionsAsync();
+    if (!granted) alert("You need to enable permission to access the library.");
   };
 
   const handlePress = () => {
     if (!imageUri) selectImage();
     else
-      Alert.alert("Delete", "Are you sure want to delete this image?", [
-        {
-          text: "yes",
-          onPress: () => onChangeImage(null),
-        },
-        {
-          text: "No",
-        },
+      Alert.alert("Delete", "Are you sure you want to delete this image?", [
+        { text: "Yes", onPress: () => onChangeImage(null) },
+        { text: "No" },
       ]);
   };
 
@@ -40,11 +36,9 @@ function ImageInput({ imageUri, onChangeImage }) {
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         quality: 0.5,
       });
-      if (!result.cancelled) {
-        onChangeImage(result.uri);
-      }
+      if (!result.cancelled) onChangeImage(result.uri);
     } catch (error) {
-      console.log("Error", error);
+      console.log("Error reading an image", error);
     }
   };
 
@@ -53,9 +47,9 @@ function ImageInput({ imageUri, onChangeImage }) {
       <View style={styles.container}>
         {!imageUri && (
           <MaterialCommunityIcons
+            color={colors.medium}
             name="camera"
             size={40}
-            color={colors.medium}
           />
         )}
         {imageUri && <Image source={{ uri: imageUri }} style={styles.image} />}
@@ -66,18 +60,18 @@ function ImageInput({ imageUri, onChangeImage }) {
 
 const styles = StyleSheet.create({
   container: {
+    alignItems: "center",
     backgroundColor: colors.light,
     borderRadius: 15,
-    justifyContent: "center",
-    alignItems: "center",
     height: 100,
-    width: 100,
+    justifyContent: "center",
+    marginVertical: 10,
     overflow: "hidden",
-    marginHorizontal: 5,
+    width: 100,
   },
   image: {
-    width: "100%",
     height: "100%",
+    width: "100%",
   },
 });
 
